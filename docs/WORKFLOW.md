@@ -182,6 +182,9 @@ Cross-cutting track; items become mandatory before any paid/external deployment.
   were driven end-to-end in the real Electron app, including a v2→v3 migration check on a
   database from the previous run and role-separation probes. `npm run build`,
   `build:portable`, `build:usb`, and `npm test` (3 tests) all pass.
+- Published **v0.2.0** on GitHub (portable exe + installer + START HERE.txt) —
+  https://github.com/waddingtoni7652-hash/FTO-App/releases/tag/v0.2.0. Existing v0.1.0
+  data upgrades in place (Dexie v3 migration verified on real data).
 - **Next up:** user is sourcing real agency TCOLE FTO documents/DOR forms — when they arrive,
   reshape the printable DOR to match and run the SME curriculum review. Remaining Phase B/P:
   per-agency task customization (Phase C), code signing, product name decision.
