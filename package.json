@@ -1,7 +1,7 @@
 {
   "name": "fto-portal",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Field Training Officer and trainee portal for county corrections training. Works fully offline.",
   "author": "FTO Portal Project",
   "type": "module",

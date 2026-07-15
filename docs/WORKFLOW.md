@@ -211,3 +211,5 @@ Cross-cutting track; items become mandatory before any paid/external deployment.
   customized checklist read-only with no Curriculum tab; delete-with-sign-offs warns.
 - v0.2.0 remains the released build (user is field-testing it on a USB stick at work);
   these features await the next release cut.
+- **Field test result:** user ran v0.2.0 from a USB stick on a work machine — went well
+  (no blockers reported). First successful real-facility run.
