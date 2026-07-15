@@ -82,6 +82,19 @@ never delete that folder, and close the app before unplugging the stick.
 The exe is unsigned, so Windows SmartScreen shows a one-time
 "More info → Run anyway" prompt on each new computer.
 
+### Installed option: setup wizard for a dedicated PC
+
+```bash
+npm run build:installer
+```
+
+This produces `dist-usb/FTO-Training-Portal-Setup-<version>.exe`, a normal
+Windows setup wizard (per-user install, no admin rights needed) with a Start
+menu and desktop shortcut. Use this when a facility wants the portal to live
+on one training-office computer rather than a USB stick. Installed copies
+store their data per-machine in the user's AppData — **not** on removable
+media — so the USB build remains the right choice for records that travel.
+
 ### Fallback: single-file web build (any OS, data stays on the computer)
 
 ```bash

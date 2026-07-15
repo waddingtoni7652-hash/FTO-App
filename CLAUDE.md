@@ -20,7 +20,9 @@ locally in IndexedDB (Dexie). There is intentionally **no backend server** yet.
 - `npm run build` — typecheck (`tsc`) + production build to `dist/`
 - `npm run build:portable` — single-file build to `dist-portable/index.html` (USB/file:// use; no service worker — `virtual:pwa-register` is aliased to `src/pwa-stub.ts`)
 - `npm run build:usb` — portable Windows desktop app to `dist-usb/FTO-Training-Portal.exe` (Electron wrapper around the portable build; database lives in `FTO-Portal-Data/` next to the exe, i.e. on the USB stick). Also copies `usb/START HERE.txt` end-user instructions into `dist-usb/`.
+- `npm run build:installer` — NSIS setup wizard to `dist-usb/FTO-Training-Portal-Setup-<version>.exe` (per-user install, no admin; data in `%APPDATA%\fto-portal`, per-machine — the portable exe is the one whose data travels)
 - `npm run electron:dev` — run the Electron shell against the current `dist-portable` build
+- `node scripts/make-icon.mjs` — regenerate `build/icon.png` (app icon) after editing `public/icon.svg`; commit the PNG
 - `npm run preview` — serve the production build (needed to test the PWA/offline behavior; the service worker is not active in `npm run dev`)
 - `npm test` — vitest; Dexie runs against fake-indexeddb in Node (see `src/backup.test.ts` for the pattern: `import 'fake-indexeddb/auto'` before anything that touches `db`)
 

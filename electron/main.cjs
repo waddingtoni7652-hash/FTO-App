@@ -11,13 +11,17 @@ const path = require('path')
 // electron-builder's "portable" target unpacks the exe to a temp dir before
 // running, so app.getPath('exe') points at the temp copy. It sets
 // PORTABLE_EXECUTABLE_DIR to the folder the user actually launched from
-// (the USB stick). Fall back to the exe's own folder for unpackaged/dev runs.
-const portableDir =
-  process.env.PORTABLE_EXECUTABLE_DIR || path.dirname(app.getPath('exe'))
-const dataDir = path.join(portableDir, 'FTO-Portal-Data')
-
-// Must happen before the 'ready' event or Chromium ignores it.
-app.setPath('userData', dataDir)
+// (the USB stick) — its presence is what distinguishes the portable exe from
+// the NSIS-installed app. Installed copies must NOT store data next to the exe
+// (Program Files isn't user-writable); they keep Electron's default per-user
+// userData location (%APPDATA%/FTO Training Portal).
+if (process.env.PORTABLE_EXECUTABLE_DIR) {
+  // Must happen before the 'ready' event or Chromium ignores it.
+  app.setPath(
+    'userData',
+    path.join(process.env.PORTABLE_EXECUTABLE_DIR, 'FTO-Portal-Data')
+  )
+}
 
 // Two instances writing to the same LevelDB on the stick would corrupt it.
 if (!app.requestSingleInstanceLock()) {

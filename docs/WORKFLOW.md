@@ -65,18 +65,22 @@ A dual-access FTO/Trainee portal for corrections field training:
 - [ ] TDCJ standards module
 - [ ] Per-agency task customization (add/hide tasks without code changes)
 
-### Phase P — Productization (selling to other counties)
+### Phase P — Productization / go-to-market (selling to other counties)
 
 Cross-cutting track; items become mandatory before any paid/external deployment.
 
 - [ ] **Code-signing certificate** (~$100–400/yr) and sign the exe/installer in the
   build — removes the SmartScreen "Windows protected your PC" prompt. Biggest
   single professionalism win; config change, not a rewrite.
-- [ ] **Branding:** custom app icon (`.ico` ≥256px wired into electron-builder
-  `win.icon`), product name, about screen. Replaces the default Electron icon.
-- [ ] **Traditional installer target** alongside the portable exe (electron-builder
-  NSIS target from the same codebase) for counties that prefer "install on the
-  training office PC"; add auto-update once there's a distribution channel.
+- [x] **Branding: custom app icon** — `scripts/make-icon.mjs` rasterizes
+  `public/icon.svg` → `build/icon.png` (committed); electron-builder converts it
+  to the exe/installer icon (2026-07-14). Still open: about screen, final product
+  name decision.
+- [x] **Traditional installer target** — `npm run build:installer` →
+  `dist-usb/FTO-Training-Portal-Setup-<version>.exe` (NSIS, per-user, no admin
+  needed). Installed copies store data in `%APPDATA%\fto-portal` (per-machine),
+  NOT next to the exe — only the portable/USB exe uses `FTO-Portal-Data/`
+  (2026-07-14). Still open: auto-update once there's a distribution channel.
 - [ ] **Per-agency customization** (Phase C) is a sales prerequisite — no two FTO
   programs are identical.
 - [ ] **Phase D (sync + real auth) is a sales prerequisite** — plaintext PIN storage
@@ -130,3 +134,10 @@ Cross-cutting track; items become mandatory before any paid/external deployment.
   `dist-usb/` and breaking electron-builder's staging rename — build outputs are now excluded
   from watch in `vite.config.ts`. Exe is unsigned (SmartScreen prompt); icon is still the
   default Electron icon (polish item).
+- Fifth pass: Phase P (productization) roadmap section added, plus its two easy wins:
+  custom app icon (shield SVG → `build/icon.png` via `scripts/make-icon.mjs` + sharp) and
+  NSIS installer (`npm run build:installer`, per-user, no admin). `electron/main.cjs` now
+  only redirects userData when `PORTABLE_EXECUTABLE_DIR` is set — installed copies use
+  default `%APPDATA%\fto-portal`. Verified: portable exe still creates `FTO-Portal-Data`
+  next to itself; installer silent-installs, stores data in AppData, uninstalls cleanly;
+  icon embedded in both artifacts.

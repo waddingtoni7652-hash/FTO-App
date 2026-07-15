@@ -2,6 +2,8 @@
   "name": "fto-portal",
   "private": true,
   "version": "0.1.0",
+  "description": "Field Training Officer and trainee portal for county corrections training. Works fully offline.",
+  "author": "FTO Portal Project",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
@@ -9,6 +11,7 @@
     "build": "tsc && vite build",
     "build:portable": "tsc && vite build --config vite.portable.config.ts",
     "build:usb": "npm run build:portable && electron-builder --win portable && node scripts/copy-usb-extras.mjs",
+    "build:installer": "npm run build:portable && electron-builder --win nsis",
     "electron:dev": "electron .",
     "preview": "vite preview",
     "test": "vitest run"
@@ -27,10 +30,16 @@
     "win": {
       "target": [
         "portable"
-      ]
+      ],
+      "icon": "build/icon.png"
     },
     "portable": {
       "artifactName": "FTO-Training-Portal.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "FTO-Training-Portal-Setup-${version}.exe"
     }
   },
   "dependencies": {
@@ -47,6 +56,7 @@
     "electron": "^43.1.1",
     "electron-builder": "^26.15.3",
     "fake-indexeddb": "^6.2.5",
+    "sharp": "^0.35.3",
     "typescript": "^5.6.3",
     "vite": "^5.4.11",
     "vite-plugin-pwa": "^0.21.1",
