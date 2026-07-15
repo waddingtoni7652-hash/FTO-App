@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  // Baked in at build time; all builds run through npm scripts (see package.json).
+  define: {
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version ?? 'dev')
+  },
   server: {
     watch: {
       // Build outputs, not sources. Watching dist-usb in particular holds

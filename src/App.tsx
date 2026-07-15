@@ -52,6 +52,10 @@ export default function App() {
   return (
     <AuthProvider>
       <Shell />
+      {/* Visible on every screen (incl. setup/login) so any USB stick shows what it runs. */}
+      <div className="version-tag no-print" title="App version">
+        v{__APP_VERSION__}
+      </div>
     </AuthProvider>
   )
 }

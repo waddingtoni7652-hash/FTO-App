@@ -475,6 +475,15 @@ details.dor summary {
   }
 }
 
+.version-tag {
+  position: fixed;
+  bottom: 0.25rem;
+  right: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  pointer-events: none;
+}
+
 /* ---------- Print preview overlay & printable documents ---------- */
 
 .print-overlay {
