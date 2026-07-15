@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Dor } from '../db'
 import { PHASES, DOR_CATEGORIES, RATING_LABELS } from '../data/standards'
+import DorPrint from './DorPrint'
 
 interface Props {
   traineeId: number
@@ -9,6 +11,7 @@ interface Props {
 }
 
 export default function DorList({ traineeId, canAcknowledge }: Props) {
+  const [printDor, setPrintDor] = useState<Dor | null>(null)
   const dors = useLiveQuery(
     () => db.dors.where('traineeId').equals(traineeId).reverse().sortBy('date'),
     [traineeId]
@@ -80,8 +83,12 @@ export default function DorList({ traineeId, canAcknowledge }: Props) {
               Acknowledged {new Date(dor.acknowledgedAt).toLocaleString()}
             </p>
           )}
+          <button className="link" onClick={() => setPrintDor(dor)}>
+            Print / Save as PDF
+          </button>
         </details>
       ))}
+      {printDor && <DorPrint dor={printDor} onClose={() => setPrintDor(null)} />}
     </div>
   )
 }

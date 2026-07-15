@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type TaskCompletion } from '../db'
-import { PHASES } from '../data/standards'
+import { PHASES, ALL_TASKS, type TrainingTask } from '../data/standards'
+import CertificatePrint from './CertificatePrint'
 
 interface Props {
   traineeId: number
@@ -9,6 +11,8 @@ interface Props {
 }
 
 export default function PhaseChecklist({ traineeId, ftoId }: Props) {
+  /** Phase id to print a certificate for, 'program' for the whole program, or null. */
+  const [certScope, setCertScope] = useState<string | null>(null)
   const completions = useLiveQuery(
     () => db.taskCompletions.where('traineeId').equals(traineeId).toArray(),
     [traineeId]
@@ -19,6 +23,7 @@ export default function PhaseChecklist({ traineeId, ftoId }: Props) {
 
   const byTask = new Map<string, TaskCompletion>(completions.map((c) => [c.taskId, c]))
   const userName = (id?: number) => users.find((u) => u.id === id)?.name ?? 'Unknown'
+  const trainee = users.find((u) => u.id === traineeId)
 
   async function toggle(taskId: string) {
     if (ftoId === undefined) return
@@ -35,17 +40,50 @@ export default function PhaseChecklist({ traineeId, ftoId }: Props) {
     }
   }
 
+  const isSigned = (t: TrainingTask) => byTask.get(t.id)?.status === 'signed_off'
+
+  /** Certificate details for a task set: last sign-off timestamp and its FTO. */
+  function certInfo(tasks: TrainingTask[]) {
+    let last: TaskCompletion | undefined
+    for (const t of tasks) {
+      const c = byTask.get(t.id)
+      if (c?.signedAt && (!last?.signedAt || c.signedAt > last.signedAt)) last = c
+    }
+    return {
+      completedOn: last?.signedAt ?? new Date().toISOString(),
+      ftoName: last?.signedByFtoId !== undefined ? userName(last.signedByFtoId) : undefined
+    }
+  }
+
+  const programDone = ALL_TASKS.every(isSigned)
+  const certPhase = certScope === null ? null : PHASES.find((p) => p.id === certScope) ?? null
+  const certTasks = certScope === 'program' ? ALL_TASKS : certPhase?.tasks ?? null
+
   return (
     <div className="checklist">
+      {programDone && trainee && (
+        <p className="notice">
+          All phases complete.{' '}
+          <button className="link" onClick={() => setCertScope('program')}>
+            Print program completion certificate
+          </button>
+        </p>
+      )}
       {PHASES.map((phase) => {
-        const done = phase.tasks.filter((t) => byTask.get(t.id)?.status === 'signed_off').length
+        const done = phase.tasks.filter(isSigned).length
+        const phaseDone = done === phase.tasks.length
         return (
           <section key={phase.id} className="card">
             <h3>
               {phase.name}{' '}
-              <span className={`pill ${done === phase.tasks.length ? 'pill-done' : ''}`}>
+              <span className={`pill ${phaseDone ? 'pill-done' : ''}`}>
                 {done}/{phase.tasks.length}
               </span>
+              {phaseDone && trainee && (
+                <button className="link" onClick={() => setCertScope(phase.id)}>
+                  Print certificate
+                </button>
+              )}
             </h3>
             <p className="muted">{phase.summary}</p>
             <ul className="task-list">
@@ -80,6 +118,15 @@ export default function PhaseChecklist({ traineeId, ftoId }: Props) {
           </section>
         )
       })}
+      {certScope && certTasks && trainee && (
+        <CertificatePrint
+          trainee={trainee}
+          phaseName={certScope === 'program' ? null : certPhase?.name ?? null}
+          taskCount={certTasks.length}
+          {...certInfo(certTasks)}
+          onClose={() => setCertScope(null)}
+        />
+      )}
     </div>
   )
 }

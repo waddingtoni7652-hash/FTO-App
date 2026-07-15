@@ -5,6 +5,7 @@ import {
   hashPin,
   DEFAULT_REQUIRED_HOURS,
   SETTING_REQUIRED_HOURS,
+  SETTING_AGENCY_NAME,
   type Role,
   type User
 } from '../db'
@@ -160,18 +161,26 @@ function UserRow({ u, self, ftos }: { u: User; self: boolean; ftos: User[] }) {
 
 function ProgramSettings() {
   const setting = useLiveQuery(() => db.settings.get(SETTING_REQUIRED_HOURS), [])
+  const agencySetting = useLiveQuery(() => db.settings.get(SETTING_AGENCY_NAME), [])
   const [hours, setHours] = useState('')
+  const [agency, setAgency] = useState('')
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     setHours(setting?.value ?? String(DEFAULT_REQUIRED_HOURS))
   }, [setting])
+  useEffect(() => {
+    setAgency(agencySetting?.value ?? '')
+  }, [agencySetting])
 
   async function save(e: FormEvent) {
     e.preventDefault()
     const n = Number(hours)
     if (!Number.isFinite(n) || n <= 0) return
-    await db.settings.put({ key: SETTING_REQUIRED_HOURS, value: String(n) })
+    await db.settings.bulkPut([
+      { key: SETTING_REQUIRED_HOURS, value: String(n) },
+      { key: SETTING_AGENCY_NAME, value: agency.trim() }
+    ])
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }
@@ -179,6 +188,17 @@ function ProgramSettings() {
   return (
     <form className="card narrow" onSubmit={save}>
       <h3>Program settings</h3>
+      <label>
+        Agency / facility name
+        <input
+          value={agency}
+          onChange={(e) => setAgency(e.target.value)}
+          placeholder="e.g. Example County Sheriff's Office"
+        />
+      </label>
+      <p className="muted small">
+        Appears as the header on printed Daily Observation Reports and completion certificates.
+      </p>
       <label>
         Required training hours per trainee
         <input type="number" min={1} value={hours} onChange={(e) => setHours(e.target.value)} required />

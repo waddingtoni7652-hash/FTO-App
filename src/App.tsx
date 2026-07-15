@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { db, type Role } from './db'
+import { db, SETTING_AGENCY_NAME, type Role } from './db'
 import { AuthProvider, useAuth } from './auth'
 import Setup from './pages/Setup'
 import Login from './pages/Login'
@@ -15,6 +15,7 @@ export const ROLE_LABELS: Record<Role, string> = {
 
 function Shell() {
   const userCount = useLiveQuery(() => db.users.count())
+  const agency = useLiveQuery(() => db.settings.get(SETTING_AGENCY_NAME), [])
   const { user, loading, logout } = useAuth()
 
   if (userCount === undefined || loading) {
@@ -28,7 +29,7 @@ function Shell() {
       <header className="topbar">
         <div className="brand">
           <strong>FTO Corrections Training Portal</strong>
-          <span className="muted"> · TCOLE Jail Standards</span>
+          <span className="muted"> · {agency?.value || 'TCOLE Jail Standards'}</span>
         </div>
         <div className="user-chip">
           <span className={`badge badge-${user.role}`}>{ROLE_LABELS[user.role]}</span>

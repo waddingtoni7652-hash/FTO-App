@@ -92,6 +92,8 @@ export const db = new FtoDb()
 
 export const SETTING_REQUIRED_HOURS = 'requiredHours'
 export const DEFAULT_REQUIRED_HOURS = 160
+/** Agency / facility name shown on printed reports and certificates. */
+export const SETTING_AGENCY_NAME = 'agencyName'
 
 export async function getRequiredHours(): Promise<number> {
   const s = await db.settings.get(SETTING_REQUIRED_HOURS)

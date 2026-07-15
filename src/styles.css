@@ -455,3 +455,254 @@ details.dor summary {
     min-width: 100%;
   }
 }
+
+/* ---------- Print preview overlay & printable documents ---------- */
+
+.print-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: #3a4550;
+  overflow: auto;
+  padding: 1rem;
+}
+
+.print-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  max-width: 52rem;
+  margin: 0 auto 0.8rem;
+  color: #fff;
+}
+
+.print-toolbar-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.print-toolbar button {
+  margin-top: 0;
+}
+
+.print-sheet {
+  background: #fff;
+  color: #000;
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 2.5rem 3rem;
+  border-radius: 4px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+}
+
+.doc-head {
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+
+.doc-head h1 {
+  margin: 0.2rem 0;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.doc-agency {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.doc-sub {
+  color: #444;
+  font-size: 0.95rem;
+}
+
+table.doc-meta {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.8rem 0;
+}
+
+table.doc-meta th,
+table.doc-meta td {
+  border: 1px solid #333;
+  padding: 0.35rem 0.6rem;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+table.doc-meta th {
+  background: #eef1f4;
+  width: 22%;
+}
+
+.doc-check {
+  margin-right: 1.2rem;
+  white-space: nowrap;
+}
+
+table.doc-ratings {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.8rem 0 0.3rem;
+}
+
+table.doc-ratings th,
+table.doc-ratings td {
+  border: 1px solid #333;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+table.doc-ratings th:not(:first-child),
+table.doc-ratings td:not(:first-child) {
+  text-align: center;
+  width: 2.6rem;
+}
+
+table.doc-ratings th {
+  background: #eef1f4;
+}
+
+.doc-mark {
+  font-weight: 700;
+}
+
+.doc-scale {
+  font-size: 0.8rem;
+  color: #444;
+  margin: 0 0 0.8rem;
+}
+
+.doc-block {
+  border: 1px solid #333;
+  padding: 0.5rem 0.8rem;
+  margin: 0.6rem 0;
+}
+
+.doc-block h2 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin: 0 0 0.3rem;
+}
+
+.doc-block p {
+  margin: 0;
+  min-height: 2.4rem;
+  white-space: pre-wrap;
+}
+
+.doc-ack {
+  font-size: 0.9rem;
+  font-style: italic;
+  margin: 0.8rem 0 0;
+}
+
+.doc-signatures {
+  display: flex;
+  gap: 3rem;
+  margin-top: 2.6rem;
+}
+
+.doc-sig {
+  flex: 1;
+  font-size: 0.9rem;
+}
+
+.doc-sig-line {
+  border-bottom: 1px solid #000;
+  height: 1.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.doc-sig-date {
+  margin-top: 0.5rem;
+}
+
+.doc-sig-name {
+  color: #444;
+}
+
+/* Certificate */
+
+.cert {
+  border: 4px double #16222e;
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+
+.cert-agency {
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.cert-title {
+  font-size: 2rem;
+  margin: 1rem 0 0.6rem;
+  letter-spacing: 0.03em;
+}
+
+.cert-lead {
+  margin: 0.4rem 0;
+  color: #333;
+}
+
+.cert-name {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin: 0.4rem 0 0.1rem;
+}
+
+.cert-badge {
+  color: #444;
+  margin-bottom: 0.8rem;
+}
+
+.cert-body {
+  max-width: 34rem;
+  margin: 0.6rem auto;
+}
+
+.cert-date {
+  margin: 1.2rem 0 0;
+  font-weight: 600;
+}
+
+.cert-signatures {
+  margin-top: 3.2rem;
+  text-align: left;
+}
+
+/* Print rules: only the sheet content goes to paper */
+
+@page {
+  margin: 0.6in;
+}
+
+@media print {
+  body.print-mode #root {
+    display: none;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-overlay {
+    position: static;
+    padding: 0;
+    background: none;
+    overflow: visible;
+  }
+  .print-sheet {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
