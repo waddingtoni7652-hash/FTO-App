@@ -19,6 +19,8 @@ locally in IndexedDB (Dexie). There is intentionally **no backend server** yet.
 - `npm run dev` — dev server (Vite, http://localhost:5173)
 - `npm run build` — typecheck (`tsc`) + production build to `dist/`
 - `npm run build:portable` — single-file build to `dist-portable/index.html` (USB/file:// use; no service worker — `virtual:pwa-register` is aliased to `src/pwa-stub.ts`)
+- `npm run build:usb` — portable Windows desktop app to `dist-usb/FTO-Training-Portal.exe` (Electron wrapper around the portable build; database lives in `FTO-Portal-Data/` next to the exe, i.e. on the USB stick). Also copies `usb/START HERE.txt` end-user instructions into `dist-usb/`.
+- `npm run electron:dev` — run the Electron shell against the current `dist-portable` build
 - `npm run preview` — serve the production build (needed to test the PWA/offline behavior; the service worker is not active in `npm run dev`)
 - `npm test` — vitest; Dexie runs against fake-indexeddb in Node (see `src/backup.test.ts` for the pattern: `import 'fake-indexeddb/auto'` before anything that touches `db`)
 
@@ -37,6 +39,7 @@ locally in IndexedDB (Dexie). There is intentionally **no backend server** yet.
 - `src/components/TraineeSummary.tsx` — hours (vs. required-hours setting), days passed/observed, tasks, phases.
 - DORs carry `hoursCredited` (accumulates toward required hours) and `dailyResult` (`pass` | `needs_improvement`).
 - `src/backup.ts` — whole-database JSON export/import (replace-all, id-preserving); UI in the admin "Backup & transfer" tab. New tables must be added to `BackupFile`, `exportData`, `validateBackup`, `importData`, and the round-trip test.
+- `electron/main.cjs` — Electron entry for the USB desktop build. Its one essential trick: `app.setPath('userData', <exe dir>/FTO-Portal-Data)` before ready, which puts IndexedDB (the whole Dexie DB) on the USB stick. It loads `dist-portable/index.html` (the no-service-worker build), so the web portable build is also the Electron payload. electron-builder config is the `"build"` field in `package.json` (portable target → `dist-usb/`).
 
 ## Rules for this codebase
 
@@ -44,5 +47,5 @@ locally in IndexedDB (Dexie). There is intentionally **no backend server** yet.
 2. **Curriculum content is safety-critical.** Tasks in `src/data/standards.ts` cite TCOLE/TCJS references written from general knowledge — they are a baseline, flagged for agency verification. Do not present them as authoritative; keep the disclaimer in that file and in the README.
 3. **Auth is a local convenience gate, not security.** PINs are SHA-256 hashed for login AND stored in plaintext (`User.pin`) so admins can view them — a deliberate, user-approved tradeoff for the local-only baseline. Do not claim security in UI or docs. Real auth (and removal of `User.pin`) arrives with the sync backend (see docs/WORKFLOW.md roadmap Phase D).
 4. **Role separation matters.** Trainees must never be able to sign off their own tasks or edit DORs — only acknowledge. FTOs must only reach trainees assigned to them; only admins manage accounts/assignments. Check any new feature against all three roles.
-5. **Both builds must keep working.** `npm run build` (PWA) and `npm run build:portable` (single-file, no service worker, non-secure context) — avoid APIs that require a secure context (e.g., `crypto.subtle`, clipboard) or provide fallbacks.
+5. **All three builds must keep working.** `npm run build` (PWA), `npm run build:portable` (single-file, no service worker, non-secure context), and `npm run build:usb` (Electron portable exe, which wraps the portable build) — avoid APIs that require a secure context (e.g., `crypto.subtle`, clipboard) or provide fallbacks.
 6. Read `docs/WORKFLOW.md` at the start of a session for the roadmap and current status; update its status section at the end of significant work.

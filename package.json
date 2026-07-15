@@ -3,12 +3,35 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "build:portable": "tsc && vite build --config vite.portable.config.ts",
+    "build:usb": "npm run build:portable && electron-builder --win portable && node scripts/copy-usb-extras.mjs",
+    "electron:dev": "electron .",
     "preview": "vite preview",
     "test": "vitest run"
+  },
+  "build": {
+    "appId": "org.ftoportal.app",
+    "productName": "FTO Training Portal",
+    "electronVersion": "43.1.1",
+    "directories": {
+      "output": "dist-usb"
+    },
+    "files": [
+      "electron/**/*",
+      "dist-portable/**/*"
+    ],
+    "win": {
+      "target": [
+        "portable"
+      ]
+    },
+    "portable": {
+      "artifactName": "FTO-Training-Portal.exe"
+    }
   },
   "dependencies": {
     "dexie": "^4.0.11",
@@ -21,6 +44,8 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "electron": "^43.1.1",
+    "electron-builder": "^26.15.3",
     "fake-indexeddb": "^6.2.5",
     "typescript": "^5.6.3",
     "vite": "^5.4.11",

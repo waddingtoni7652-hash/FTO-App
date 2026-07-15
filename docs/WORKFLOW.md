@@ -58,6 +58,7 @@ A dual-access FTO/Trainee portal for corrections field training:
 - [ ] Weekly/end-of-phase evaluations in addition to DORs
 - [ ] Printable/exportable reports (DOR PDF, phase completion certificate)
 - [x] Data export/import (JSON file) — admin "Backup & transfer" tab; replace-all import with confirmation; round-trip covered by `src/backup.test.ts` (2026-07-14)
+- [x] USB desktop app (`npm run build:usb`) — portable Electron exe; database stored in `FTO-Portal-Data/` next to the exe so records travel on the stick; `START HERE.txt` end-user instructions shipped alongside (2026-07-14)
 
 ### Phase C — Multi-track curriculum
 - [ ] `track` concept in data model (TCOLE Jail vs TDCJ)
@@ -78,7 +79,8 @@ A dual-access FTO/Trainee portal for corrections field training:
 - Data lives on one device only; clearing browser storage erases records (export/backup is Phase B).
 - Sign-offs can be un-checked by any FTO (no immutable audit trail yet).
 - Curriculum references are unverified against current official publications.
-- Portable (USB) build: data lives in the browser of the computer that opened it, not on the USB stick. Use Backup & transfer (admin tab) to carry a JSON export on the stick between machines. Import is replace-all, not merge — two devices editing in parallel cannot be reconciled yet (that's Phase D sync).
+- Portable (USB) **HTML** build: data lives in the browser of the computer that opened it, not on the USB stick. Use Backup & transfer (admin tab) to carry a JSON export on the stick between machines. **Solved for Windows by the USB desktop app** (`npm run build:usb`), which stores the database on the stick itself. Import is still replace-all, not merge — two devices/sticks editing in parallel cannot be reconciled yet (that's Phase D sync).
+- USB desktop app: Windows-only, exe is unsigned (SmartScreen "Run anyway" prompt), and pulling the stick while the app is open can lose recent writes. Whole-drive copy = full backup.
 - Backup files contain everything, including plaintext PINs — treat as sensitive.
 - Admins can change any non-self user's role freely; there is no confirmation or audit of role changes yet.
 
@@ -96,3 +98,12 @@ A dual-access FTO/Trainee portal for corrections field training:
 - **Next up:** printable DOR/completion reports, then curriculum verification. Ask the user
   which agency policies/forms they can supply — real DOR forms and task lists from their
   program would replace the baseline content.
+- Fourth pass: USB desktop app (user request — data must travel on the stick, double-click
+  launch for non-technical LEO users). Electron portable exe (`electron/main.cjs` +
+  electron-builder `portable` target). Key mechanism: `app.setPath('userData', ...)` points
+  Chromium's profile (IndexedDB included) at `FTO-Portal-Data/` next to the exe. Verified by
+  CDP probe: value written to IndexedDB on launch 1 read back on launch 2 from a copied
+  folder. Gotcha fixed along the way: the Vite dev server's watcher was holding handles on
+  `dist-usb/` and breaking electron-builder's staging rename — build outputs are now excluded
+  from watch in `vite.config.ts`. Exe is unsigned (SmartScreen prompt); icon is still the
+  default Electron icon (polish item).

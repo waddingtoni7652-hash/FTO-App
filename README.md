@@ -39,6 +39,9 @@ locally on the device in IndexedDB.
   administrator; sign-in is by user selection + PIN.
 - **Installable & offline** — service worker caches the entire app; works with no
   network after first load.
+- **USB desktop app** — `npm run build:usb` produces a portable Windows
+  `.exe` that runs straight off a USB stick and **stores its database on the
+  stick**, so records travel between facilities with the drive (see below).
 - **Portable single-file build** — `npm run build:portable` produces one
   `index.html` that runs from a USB drive by double-clicking (see below).
 - **Backup & transfer** — admins can export the entire database to a JSON file
@@ -60,6 +63,27 @@ once from a laptop/local server and then runs entirely from the device cache.
 
 ## USB / portable use
 
+### Recommended: the USB desktop app (data travels with the stick)
+
+```bash
+npm run build:usb
+```
+
+This produces `dist-usb/FTO-Training-Portal.exe` (plus a `START HERE.txt` with
+end-user instructions). Copy both onto a USB drive. On any Windows computer,
+the user just **double-clicks the exe** — no internet, no installation, no
+admin rights.
+
+The app stores its entire database in a `FTO-Portal-Data` folder created next
+to the exe **on the USB stick itself**, so all accounts, sign-offs, and DORs
+travel with the drive between facilities and computers. Two rules for users:
+never delete that folder, and close the app before unplugging the stick.
+
+The exe is unsigned, so Windows SmartScreen shows a one-time
+"More info → Run anyway" prompt on each new computer.
+
+### Fallback: single-file web build (any OS, data stays on the computer)
+
 ```bash
 npm run build:portable
 ```
@@ -68,12 +92,12 @@ This produces a single self-contained file, `dist-portable/index.html`. Copy it
 to a USB drive; on any computer, double-click it and it opens in the default
 browser and works fully — **no internet, no install, no server**.
 
-Important: records are saved in the **browser of the computer that opened it**
-(IndexedDB), not on the USB stick. To move records between machines, use the
-admin **Backup & transfer** tab: export the JSON backup onto the stick, then
-import it on the other machine (this replaces that machine's data). Backup
-files contain everything — including PINs — so handle them like sensitive
-paperwork.
+Important: with this version, records are saved in the **browser of the
+computer that opened it** (IndexedDB), not on the USB stick. To move records
+between machines, use the admin **Backup & transfer** tab: export the JSON
+backup onto the stick, then import it on the other machine (this replaces that
+machine's data). Backup files contain everything — including PINs — so handle
+them like sensitive paperwork.
 
 ## Important disclaimers
 

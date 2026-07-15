@@ -1,0 +1,44 @@
+==========================================
+ FTO CORRECTIONS TRAINING PORTAL — USB APP
+==========================================
+
+HOW TO START THE APP
+--------------------
+1. Plug this USB drive into the computer.
+2. Open the USB drive in File Explorer.
+3. Double-click:  FTO-Training-Portal.exe
+   That's it. No internet, no installation, no password for the
+   computer needed.
+
+The first time you run it on a computer, Windows may show a blue
+"Windows protected your PC" screen. Click "More info", then
+"Run anyway". This appears because the app isn't from the
+Microsoft Store — it is safe and runs completely offline.
+
+FIRST TIME EVER USING THE PORTAL?
+---------------------------------
+The app will ask you to create the ADMINISTRATOR account (name +
+PIN). The admin creates all FTO and trainee accounts and assigns
+trainees to FTOs from the "User management" tab.
+
+WHERE YOUR RECORDS LIVE  (IMPORTANT)
+------------------------------------
+All accounts, sign-offs, and DORs are saved in the folder named
+"FTO-Portal-Data" that sits NEXT TO the .exe on this USB drive.
+
+That means:
+  * Your records TRAVEL WITH THE USB DRIVE. Plug it into any
+    Windows computer at any facility and everything is there.
+  * NEVER delete the FTO-Portal-Data folder — that is the database.
+  * ALWAYS CLOSE THE APP before pulling the USB drive out, or the
+    most recent entries may be lost.
+
+BACKUPS
+-------
+USB drives fail and get lost. From the admin account, use the
+"Backup & transfer" tab to export a backup file regularly and keep
+it somewhere safe (another drive or computer). Backup files contain
+everything — including PINs — so treat them like sensitive paperwork.
+
+Keeping a copy of this entire USB drive (exe + FTO-Portal-Data
+folder) is also a complete backup.

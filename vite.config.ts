@@ -3,6 +3,13 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  server: {
+    watch: {
+      // Build outputs, not sources. Watching dist-usb in particular holds
+      // file handles that break electron-builder's staging-folder rename.
+      ignored: ['**/dist/**', '**/dist-portable/**', '**/dist-usb/**']
+    }
+  },
   plugins: [
     react(),
     VitePWA({
