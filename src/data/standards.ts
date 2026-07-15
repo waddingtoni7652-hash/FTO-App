@@ -7,6 +7,16 @@
  * operational use, every task and reference must be verified against the
  * agency's current policies and the official TCOLE/TCJS publications.
  * TDCJ (state corrections) standards are planned as a future, separate track.
+ *
+ * Citation check (2026-07-15): TCJS chapter/section references below were
+ * verified against the Texas Administrative Code, Title 37, Part 9 chapter
+ * and section structure (37 TAC §§251–301). TCOLE course numbers are
+ * deliberately omitted — TCOLE renumbered the basic jailer courses (e.g.
+ * #1120/#1121 → online equivalents #1196/#1197, new curriculum April 2026),
+ * so tasks cite "BCCC" topic areas generically. Statutory cites (CCP art.
+ * 15.17, Penal Code ch. 9 / §38.11 / §39.04, Occupations Code ch. 1701,
+ * SB 1849 "Sandra Bland Act", PREA 28 CFR pt. 115) are from general legal
+ * knowledge. An agency SME review remains REQUIRED before operational use.
  */
 
 export interface TrainingTask {
@@ -36,7 +46,7 @@ export const PHASES: TrainingPhase[] = [
         title: 'Complete guided facility tour',
         description:
           'Walk all housing units, booking, medical, kitchen, laundry, recreation, and sally ports. Identify emergency exits and fire equipment locations.',
-        reference: 'Agency policy / TCJS Ch. 263 (Life Safety)'
+        reference: 'Agency policy / TCJS Ch. 263 (Life Safety Rules)'
       },
       {
         id: 'p1-chain-of-command',
@@ -48,7 +58,7 @@ export const PHASES: TrainingPhase[] = [
         id: 'p1-keys-radio',
         title: 'Key, radio, and tool control',
         description: 'Demonstrate proper key control, radio procedures/codes, and tool & sharps accountability.',
-        reference: 'TCJS §351 / Agency policy'
+        reference: 'Agency policy / BCCC facility security'
       },
       {
         id: 'p1-tcole-overview',
@@ -67,7 +77,7 @@ export const PHASES: TrainingPhase[] = [
         id: 'p1-prea',
         title: 'PREA awareness',
         description: 'Review Prison Rape Elimination Act requirements, zero-tolerance policy, and reporting paths.',
-        reference: 'PREA / Agency policy'
+        reference: 'PREA (28 CFR Part 115) / Agency policy'
       }
     ]
   },
@@ -93,19 +103,19 @@ export const PHASES: TrainingPhase[] = [
         title: 'Health & mental health intake screening',
         description:
           'Complete the TCJS Screening Form for Suicide and Medical/Mental/Developmental Impairments and route referrals correctly.',
-        reference: 'TCJS §273.5 / Sandra Bland Act'
+        reference: 'TCJS §273.5 / Sandra Bland Act (SB 1849, 2017)'
       },
       {
         id: 'p2-suicide-flags',
         title: 'Suicide risk indicators at intake',
         description: 'Recognize risk indicators and initiate notification/observation procedures.',
-        reference: 'TCJS / BCCC suicide detection & prevention'
+        reference: 'TCJS §273.5 / BCCC suicide detection & prevention'
       },
       {
         id: 'p2-records',
         title: 'Booking records & identification',
         description: 'Complete booking records, fingerprints, photographs, and warrant/hold checks.',
-        reference: 'Agency policy / CCP requirements'
+        reference: 'TCJS Ch. 269 (Records and Procedures) / Agency policy'
       },
       {
         id: 'p2-magistrate',
@@ -117,7 +127,7 @@ export const PHASES: TrainingPhase[] = [
         id: 'p2-classification',
         title: 'Objective classification basics',
         description: 'Apply the classification instrument to determine custody level and housing assignment.',
-        reference: 'TCJS §271 (Classification)'
+        reference: 'TCJS Ch. 271 (Classification and Separation of Inmates)'
       }
     ]
   },
@@ -131,38 +141,38 @@ export const PHASES: TrainingPhase[] = [
         title: 'Face-to-face observation checks',
         description:
           'Conduct and document required observation rounds (60-minute general population; 30-minute or closer for at-risk inmates).',
-        reference: 'TCJS §275.1 (Supervision)'
+        reference: 'TCJS §275.1 (Regular Observation by Jailers)'
       },
       {
         id: 'p3-counts',
         title: 'Formal counts',
         description: 'Conduct and reconcile formal headcounts and emergency counts.',
-        reference: 'Agency policy'
+        reference: 'TCJS §275.5 (Census) / Agency policy'
       },
       {
         id: 'p3-searches',
         title: 'Cell & area searches / contraband control',
         description: 'Perform systematic cell searches, identify contraband, and document findings.',
-        reference: 'Agency policy / BCCC security procedures'
+        reference: 'TCJS §275.6 (Searches for Contraband) / Agency policy'
       },
       {
         id: 'p3-meals-med',
         title: 'Meal service & medication pass security',
         description: 'Supervise meal service and support medical staff during medication pass.',
-        reference: 'TCJS §273 (Health Services)'
+        reference: 'TCJS Ch. 281 (Food Service) / Ch. 273 (Health Services)'
       },
       {
         id: 'p3-rights',
         title: 'Inmate rights & privileges',
         description:
           'Explain inmate rights (visitation, mail, telephone, recreation, religious practice) and privilege rules.',
-        reference: 'TCJS §291 / BCCC inmate rights'
+        reference: 'TCJS Ch. 291 (Services and Activities), Ch. 285 (Recreation and Exercise) / BCCC inmate rights'
       },
       {
         id: 'p3-grievance',
         title: 'Grievance & request procedures',
         description: 'Process inmate requests and grievances within required timelines.',
-        reference: 'TCJS §283 (Grievances)'
+        reference: 'TCJS Ch. 283 (Discipline and Grievances)'
       },
       {
         id: 'p3-communication',
@@ -187,7 +197,7 @@ export const PHASES: TrainingPhase[] = [
         id: 'p4-restraints',
         title: 'Application of restraints',
         description: 'Demonstrate safe application of handcuffs and other approved restraint devices.',
-        reference: 'Agency policy / TCJS restraint rules'
+        reference: 'TCJS §273.6 (Restraints) / Agency policy'
       },
       {
         id: 'p4-suicide-watch',
@@ -199,19 +209,19 @@ export const PHASES: TrainingPhase[] = [
         id: 'p4-fire',
         title: 'Fire & evacuation procedures',
         description: 'Locate fire panels/extinguishers, demonstrate SCBA familiarization, and walk evacuation routes.',
-        reference: 'TCJS Ch. 263 (Life Safety)'
+        reference: 'TCJS Ch. 263 (Life Safety Rules), §263.41 (Training and Drills)'
       },
       {
         id: 'p4-medical-emergency',
         title: 'Medical emergency response',
         description: 'Respond to a medical emergency drill including CPR/AED access and medical notification.',
-        reference: 'TCJS §273 / Agency policy'
+        reference: 'TCJS Ch. 273 (Health Services) / Agency policy'
       },
       {
         id: 'p4-incident-command',
         title: 'Emergency plans & incident reporting',
         description: 'Review facility emergency plans (riot, escape, hostage, severe weather) and reporting duties.',
-        reference: 'TCJS §351.15 / Agency emergency plans'
+        reference: 'TCJS §263.40 (Emergency Plans) / Agency emergency plans'
       }
     ]
   },
@@ -236,7 +246,7 @@ export const PHASES: TrainingPhase[] = [
         id: 'p5-transport',
         title: 'Inmate transport procedures',
         description: 'Demonstrate transport preparation, restraint use in vehicles, and court/medical transport security.',
-        reference: 'Agency policy'
+        reference: 'Agency policy / TCJS §275.7 (supervision outside the security perimeter)'
       },
       {
         id: 'p5-testimony',
