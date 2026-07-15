@@ -303,6 +303,25 @@ button.link {
   font-weight: 600;
 }
 
+.task-extra {
+  margin-left: 2rem;
+}
+
+.task-note {
+  background: #f2f6fa;
+  border-left: 3px solid var(--accent);
+  padding: 0.3rem 0.6rem;
+  margin-top: 0.3rem;
+}
+
+.task-note-edit textarea {
+  margin-top: 0.3rem;
+}
+
+.task-actions button.link {
+  padding-left: 0;
+}
+
 .task.done .task-title {
   color: var(--green);
 }

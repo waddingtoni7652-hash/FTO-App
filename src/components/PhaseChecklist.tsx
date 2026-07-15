@@ -13,6 +13,9 @@ interface Props {
 export default function PhaseChecklist({ traineeId, ftoId }: Props) {
   /** Phase id to print a certificate for, 'program' for the whole program, or null. */
   const [certScope, setCertScope] = useState<string | null>(null)
+  /** Task id whose FTO note is being edited, and the draft text. */
+  const [editingTask, setEditingTask] = useState<string | null>(null)
+  const [noteDraft, setNoteDraft] = useState('')
   const completions = useLiveQuery(
     () => db.taskCompletions.where('traineeId').equals(traineeId).toArray(),
     [traineeId]
@@ -29,7 +32,16 @@ export default function PhaseChecklist({ traineeId, ftoId }: Props) {
     if (ftoId === undefined) return
     const existing = byTask.get(taskId)
     if (existing?.status === 'signed_off') {
-      await db.taskCompletions.delete(existing.id!)
+      // Keep the record if it carries a note or remedial flag — only the sign-off is undone.
+      if (existing.notes || existing.remedial) {
+        await db.taskCompletions.update(existing.id!, {
+          status: 'in_progress',
+          signedByFtoId: undefined,
+          signedAt: undefined
+        })
+      } else {
+        await db.taskCompletions.delete(existing.id!)
+      }
     } else {
       await db.taskCompletions.put({
         ...(existing ?? { traineeId, taskId, notes: '' }),
@@ -37,6 +49,37 @@ export default function PhaseChecklist({ traineeId, ftoId }: Props) {
         signedByFtoId: ftoId,
         signedAt: new Date().toISOString()
       })
+    }
+  }
+
+  async function saveNote(taskId: string) {
+    if (ftoId === undefined) return
+    const existing = byTask.get(taskId)
+    const notes = noteDraft.trim()
+    if (existing) {
+      if (!notes && existing.status !== 'signed_off' && !existing.remedial) {
+        await db.taskCompletions.delete(existing.id!)
+      } else {
+        await db.taskCompletions.update(existing.id!, { notes })
+      }
+    } else if (notes) {
+      await db.taskCompletions.add({ traineeId, taskId, status: 'in_progress', notes })
+    }
+    setEditingTask(null)
+    setNoteDraft('')
+  }
+
+  async function toggleRemedial(taskId: string) {
+    if (ftoId === undefined) return
+    const existing = byTask.get(taskId)
+    if (existing) {
+      if (existing.remedial && existing.status !== 'signed_off' && !existing.notes) {
+        await db.taskCompletions.delete(existing.id!)
+      } else {
+        await db.taskCompletions.update(existing.id!, { remedial: !existing.remedial })
+      }
+    } else {
+      await db.taskCompletions.add({ traineeId, taskId, status: 'in_progress', notes: '', remedial: true })
     }
   }
 
@@ -100,7 +143,10 @@ export default function PhaseChecklist({ traineeId, ftoId }: Props) {
                         onChange={() => toggle(task.id)}
                       />
                       <div>
-                        <div className="task-title">{task.title}</div>
+                        <div className="task-title">
+                          {task.title}{' '}
+                          {c?.remedial && <span className="pill pill-warn">Re-training</span>}
+                        </div>
                         <div className="muted small">{task.description}</div>
                         <div className="ref small">{task.reference}</div>
                         {signed && c?.signedAt && (
@@ -111,6 +157,47 @@ export default function PhaseChecklist({ traineeId, ftoId }: Props) {
                         )}
                       </div>
                     </label>
+                    <div className="task-extra">
+                      {c?.notes && editingTask !== task.id && (
+                        <div className="task-note small">
+                          <strong>FTO note:</strong> {c.notes}
+                        </div>
+                      )}
+                      {ftoId !== undefined && editingTask === task.id && (
+                        <div className="task-note-edit">
+                          <textarea
+                            rows={2}
+                            value={noteDraft}
+                            onChange={(e) => setNoteDraft(e.target.value)}
+                            placeholder="Coaching points, context for the sign-off…"
+                          />
+                          <button type="button" className="link" onClick={() => saveNote(task.id)}>
+                            Save note
+                          </button>
+                          <button
+                            type="button"
+                            className="link"
+                            onClick={() => { setEditingTask(null); setNoteDraft('') }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      )}
+                      {ftoId !== undefined && editingTask !== task.id && (
+                        <div className="task-actions small">
+                          <button
+                            type="button"
+                            className="link"
+                            onClick={() => { setEditingTask(task.id); setNoteDraft(c?.notes ?? '') }}
+                          >
+                            {c?.notes ? 'Edit note' : 'Add note'}
+                          </button>
+                          <button type="button" className="link" onClick={() => toggleRemedial(task.id)}>
+                            {c?.remedial ? 'Clear re-training flag' : 'Flag for re-training'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </li>
                 )
               })}

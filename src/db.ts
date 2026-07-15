@@ -29,7 +29,10 @@ export interface TaskCompletion {
   traineeId: number
   taskId: string
   status: TaskStatus
+  /** FTO note on this task (coaching points, context for the sign-off). */
   notes: string
+  /** Flagged by an FTO as needing remedial / re-training attention. */
+  remedial?: boolean
   signedByFtoId?: number
   signedAt?: string
 }
@@ -55,6 +58,27 @@ export interface Dor {
   createdAt: string
 }
 
+export type EvalType = 'weekly' | 'end_of_phase'
+export type EvalRecommendation = 'progress' | 'remediate'
+
+/** Weekly or end-of-phase evaluation — a step up from the daily DOR. */
+export interface Evaluation {
+  id?: number
+  traineeId: number
+  ftoId: number
+  evalType: EvalType
+  phaseId: string
+  date: string
+  /** Overall rating on the same 1–5 scale as DOR categories. */
+  overallRating: number
+  strengths: string
+  improvementAreas: string
+  narrative: string
+  recommendation: EvalRecommendation
+  acknowledgedAt?: string
+  createdAt: string
+}
+
 export interface Setting {
   key: string
   value: string
@@ -64,6 +88,7 @@ class FtoDb extends Dexie {
   users!: Table<User, number>
   taskCompletions!: Table<TaskCompletion, number>
   dors!: Table<Dor, number>
+  evaluations!: Table<Evaluation, number>
   settings!: Table<Setting, string>
 
   constructor() {
@@ -85,6 +110,10 @@ class FtoDb extends Dexie {
         const firstFto = await users.orderBy('id').filter((u) => u.role === 'fto').first()
         if (firstFto) await users.update(firstFto.id, { role: 'admin' })
       })
+    // v3: weekly / end-of-phase evaluations.
+    this.version(3).stores({
+      evaluations: '++id, traineeId, ftoId, date'
+    })
   }
 }
 

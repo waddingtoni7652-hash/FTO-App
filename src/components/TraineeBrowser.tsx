@@ -6,6 +6,8 @@ import ProgressBar from './ProgressBar'
 import PhaseChecklist from './PhaseChecklist'
 import DorList from './DorList'
 import DorForm from './DorForm'
+import EvalList from './EvalList'
+import EvalForm from './EvalForm'
 import TraineeSummary from './TraineeSummary'
 
 function TraineeRow({ trainee, onOpen }: { trainee: User; onOpen: () => void }) {
@@ -43,15 +45,16 @@ interface Props {
 /** Trainee roster + per-trainee detail (summary, checklist sign-off, DORs). */
 export default function TraineeBrowser({ title, trainees, viewerId, emptyMessage, listExtras }: Props) {
   const [selectedId, setSelectedId] = useState<number | null>(null)
-  const [tab, setTab] = useState<'checklist' | 'dors'>('checklist')
+  const [tab, setTab] = useState<'checklist' | 'dors' | 'evals'>('checklist')
   const [writingDor, setWritingDor] = useState(false)
+  const [writingEval, setWritingEval] = useState(false)
 
   const selected = trainees.find((t) => t.id === selectedId) ?? null
 
   if (selected) {
     return (
       <div>
-        <button className="link" onClick={() => { setSelectedId(null); setWritingDor(false) }}>
+        <button className="link" onClick={() => { setSelectedId(null); setWritingDor(false); setWritingEval(false) }}>
           ← Back to roster
         </button>
         <h2>
@@ -65,6 +68,9 @@ export default function TraineeBrowser({ title, trainees, viewerId, emptyMessage
           <button className={tab === 'dors' ? 'tab active' : 'tab'} onClick={() => setTab('dors')}>
             Daily Observation Reports
           </button>
+          <button className={tab === 'evals' ? 'tab active' : 'tab'} onClick={() => setTab('evals')}>
+            Evaluations
+          </button>
         </div>
         {tab === 'checklist' && <PhaseChecklist traineeId={selected.id!} ftoId={viewerId} />}
         {tab === 'dors' && (
@@ -75,6 +81,16 @@ export default function TraineeBrowser({ title, trainees, viewerId, emptyMessage
               <button onClick={() => setWritingDor(true)}>+ New DOR</button>
             )}
             <DorList traineeId={selected.id!} />
+          </div>
+        )}
+        {tab === 'evals' && (
+          <div>
+            {writingEval ? (
+              <EvalForm traineeId={selected.id!} ftoId={viewerId} onDone={() => setWritingEval(false)} />
+            ) : (
+              <button onClick={() => setWritingEval(true)}>+ New evaluation</button>
+            )}
+            <EvalList traineeId={selected.id!} />
           </div>
         )}
       </div>

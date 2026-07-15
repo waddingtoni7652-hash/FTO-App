@@ -54,18 +54,34 @@ describe('backup export/import round trip', () => {
       dailyResult: 'pass',
       createdAt: '2026-07-14T18:00:00.000Z'
     })
+    await db.evaluations.add({
+      traineeId,
+      ftoId,
+      evalType: 'end_of_phase',
+      phaseId: 'phase-1',
+      date: '2026-07-14',
+      overallRating: 4,
+      strengths: 'Communication',
+      improvementAreas: 'Report detail',
+      narrative: 'Ready to advance.',
+      recommendation: 'progress',
+      createdAt: '2026-07-14T19:00:00.000Z'
+    })
     await db.settings.put({ key: 'requiredHours', value: '200' })
 
     const backup = await exportData()
+    expect(backup.formatVersion).toBe(2)
     expect(backup.users).toHaveLength(3)
     expect(backup.taskCompletions).toHaveLength(1)
     expect(backup.dors).toHaveLength(1)
+    expect(backup.evaluations).toHaveLength(1)
     expect(backup.settings).toHaveLength(1)
 
     // Simulate a different device with unrelated data that must be replaced.
     await db.users.clear()
     await db.taskCompletions.clear()
     await db.dors.clear()
+    await db.evaluations.clear()
     await db.settings.clear()
     await db.users.add({
       name: 'Other Device User',
@@ -102,8 +118,31 @@ describe('backup export/import round trip', () => {
     expect(dors[0].dailyResult).toBe('pass')
     expect(dors[0].ratings).toEqual({ appearance: 4, attitude: 5 })
 
+    const evals = await db.evaluations.where('traineeId').equals(traineeId).toArray()
+    expect(evals).toHaveLength(1)
+    expect(evals[0].ftoId).toBe(ftoId)
+    expect(evals[0].evalType).toBe('end_of_phase')
+    expect(evals[0].recommendation).toBe('progress')
+
     const setting = await db.settings.get('requiredHours')
     expect(setting?.value).toBe('200')
+  })
+
+  it('accepts format-version-1 backups (no evaluations table)', async () => {
+    const v1 = {
+      app: 'fto-portal',
+      formatVersion: 1,
+      exportedAt: '2026-07-14T00:00:00.000Z',
+      users: [],
+      taskCompletions: [],
+      dors: [],
+      settings: [{ key: 'requiredHours', value: '120' }]
+    }
+    const parsed = validateBackup(JSON.parse(JSON.stringify(v1)))
+    expect(parsed.evaluations).toEqual([])
+    await importData(parsed)
+    expect(await db.evaluations.count()).toBe(0)
+    expect((await db.settings.get('requiredHours'))?.value).toBe('120')
   })
 
   it('rejects invalid backup files with clear errors', () => {
@@ -115,5 +154,15 @@ describe('backup export/import round trip', () => {
     expect(() =>
       validateBackup({ app: 'fto-portal', formatVersion: 1, users: [], taskCompletions: [], dors: [] })
     ).toThrow('missing the "settings" table')
+    expect(() =>
+      validateBackup({
+        app: 'fto-portal',
+        formatVersion: 2,
+        users: [],
+        taskCompletions: [],
+        dors: [],
+        settings: []
+      })
+    ).toThrow('missing the "evaluations" table')
   })
 })
