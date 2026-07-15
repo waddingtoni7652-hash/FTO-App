@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import {
   db,
@@ -8,6 +8,7 @@ import {
   type Role,
   type User
 } from '../db'
+import { exportData, importData, validateBackup } from '../backup'
 import { useAuth } from '../auth'
 import TraineeBrowser from '../components/TraineeBrowser'
 
@@ -191,10 +192,84 @@ function ProgramSettings() {
   )
 }
 
+function BackupPanel() {
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  async function download() {
+    const backup = await exportData()
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `fto-portal-backup-${backup.exportedAt.slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function onFile(e: ChangeEvent<HTMLInputElement>) {
+    setError('')
+    const input = e.target
+    const file = input.files?.[0]
+    if (!file) return
+    setBusy(true)
+    try {
+      const backup = validateBackup(JSON.parse(await file.text()))
+      const summary =
+        `${backup.users.length} user(s), ${backup.taskCompletions.length} task sign-off(s), ` +
+        `${backup.dors.length} DOR(s)`
+      const ok = window.confirm(
+        `Import backup from ${backup.exportedAt.slice(0, 10)}?\n(${summary})\n\n` +
+          'WARNING: this REPLACES ALL DATA currently on this device.'
+      )
+      if (ok) {
+        await importData(backup)
+        window.alert('Import complete. The app will now reload — sign in again.')
+        window.location.reload()
+        return
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Import failed — file could not be read.')
+    } finally {
+      setBusy(false)
+      input.value = ''
+    }
+  }
+
+  return (
+    <div>
+      <div className="card">
+        <h3>Export backup</h3>
+        <p className="muted">
+          Downloads every record on this device (accounts, sign-offs, DORs, settings) as one JSON
+          file. Use it as a backup, or carry it on a USB drive to load onto another machine.
+        </p>
+        <p className="muted small">
+          The file includes PINs and training records — store and transport it like any sensitive
+          paperwork.
+        </p>
+        <button onClick={download}>Download backup file</button>
+      </div>
+      <div className="card">
+        <h3>Import backup</h3>
+        <p className="muted">
+          Loads a backup file onto this device. <strong>Replaces everything currently here</strong> —
+          export a backup of this device first if it has records worth keeping.
+        </p>
+        <label>
+          Backup file
+          <input type="file" accept="application/json,.json" onChange={onFile} disabled={busy} />
+        </label>
+        {error && <p className="error">{error}</p>}
+      </div>
+    </div>
+  )
+}
+
 export default function AdminDashboard() {
   const { user } = useAuth()
   const users = useLiveQuery(() => db.users.toArray(), [])
-  const [tab, setTab] = useState<'users' | 'trainees' | 'settings'>('users')
+  const [tab, setTab] = useState<'users' | 'trainees' | 'settings' | 'data'>('users')
   const [creating, setCreating] = useState(false)
 
   if (!users || !user) return <p className="muted">Loading…</p>
@@ -213,6 +288,9 @@ export default function AdminDashboard() {
         </button>
         <button className={tab === 'settings' ? 'tab active' : 'tab'} onClick={() => setTab('settings')}>
           Program settings
+        </button>
+        <button className={tab === 'data' ? 'tab active' : 'tab'} onClick={() => setTab('data')}>
+          Backup &amp; transfer
         </button>
       </div>
 
@@ -262,6 +340,8 @@ export default function AdminDashboard() {
       )}
 
       {tab === 'settings' && <ProgramSettings />}
+
+      {tab === 'data' && <BackupPanel />}
     </div>
   )
 }

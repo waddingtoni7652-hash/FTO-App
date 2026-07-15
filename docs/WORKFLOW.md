@@ -57,7 +57,7 @@ A dual-access FTO/Trainee portal for corrections field training:
 - [ ] Trainee detail: notes per task, remedial/re-training flags
 - [ ] Weekly/end-of-phase evaluations in addition to DORs
 - [ ] Printable/exportable reports (DOR PDF, phase completion certificate)
-- [ ] Data export/import (JSON file) — manual transfer between air-gapped devices; also serves as backup. Especially important for the portable/USB build, where data stays on whichever computer opened it.
+- [x] Data export/import (JSON file) — admin "Backup & transfer" tab; replace-all import with confirmation; round-trip covered by `src/backup.test.ts` (2026-07-14)
 
 ### Phase C — Multi-track curriculum
 - [ ] `track` concept in data model (TCOLE Jail vs TDCJ)
@@ -78,7 +78,8 @@ A dual-access FTO/Trainee portal for corrections field training:
 - Data lives on one device only; clearing browser storage erases records (export/backup is Phase B).
 - Sign-offs can be un-checked by any FTO (no immutable audit trail yet).
 - Curriculum references are unverified against current official publications.
-- Portable (USB) build: data lives in the browser of the computer that opened it, not on the USB stick; no data follows the stick until export/import ships.
+- Portable (USB) build: data lives in the browser of the computer that opened it, not on the USB stick. Use Backup & transfer (admin tab) to carry a JSON export on the stick between machines. Import is replace-all, not merge — two devices editing in parallel cannot be reconciled yet (that's Phase D sync).
+- Backup files contain everything, including plaintext PINs — treat as sensitive.
 - Admins can change any non-self user's role freely; there is no confirmation or audit of role changes yet.
 
 ## Status log
@@ -89,7 +90,9 @@ A dual-access FTO/Trainee portal for corrections field training:
 - Same session, second pass (Phase A.5 complete): admin role + user management + FTO↔trainee
   assignments, DOR hours + daily pass result, trainee summary stats, program settings,
   portable single-file USB build. Both builds verified passing.
-- **Next up:** JSON export/import (highest value — backup + moving data between air-gapped
-  machines), printable DOR/completion reports, curriculum verification. Ask the user which
-  agency policies/forms they can supply — real DOR forms and task lists from their program
-  would replace the baseline content.
+- Third pass: JSON export/import shipped (admin "Backup & transfer" tab, `src/backup.ts`).
+  Added vitest + fake-indexeddb test infra (`npm test`); round-trip test verifies ids,
+  references, credentials, and rejection of invalid files. Both builds + tests passing.
+- **Next up:** printable DOR/completion reports, then curriculum verification. Ask the user
+  which agency policies/forms they can supply — real DOR forms and task lists from their
+  program would replace the baseline content.

@@ -41,6 +41,9 @@ locally on the device in IndexedDB.
   network after first load.
 - **Portable single-file build** — `npm run build:portable` produces one
   `index.html` that runs from a USB drive by double-clicking (see below).
+- **Backup & transfer** — admins can export the entire database to a JSON file
+  and import it on another machine (replace-all), moving records between
+  air-gapped devices or keeping backups.
 
 ## Getting started
 
@@ -66,9 +69,11 @@ to a USB drive; on any computer, double-click it and it opens in the default
 browser and works fully — **no internet, no install, no server**.
 
 Important: records are saved in the **browser of the computer that opened it**
-(IndexedDB), not on the USB stick. Opening the file on a different computer
-starts with an empty database. Data export/import for moving records between
-machines is on the roadmap (`docs/WORKFLOW.md`, Phase B).
+(IndexedDB), not on the USB stick. To move records between machines, use the
+admin **Backup & transfer** tab: export the JSON backup onto the stick, then
+import it on the other machine (this replaces that machine's data). Backup
+files contain everything — including PINs — so handle them like sensitive
+paperwork.
 
 ## Important disclaimers
 

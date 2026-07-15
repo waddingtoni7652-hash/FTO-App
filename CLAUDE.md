@@ -20,6 +20,7 @@ locally in IndexedDB (Dexie). There is intentionally **no backend server** yet.
 - `npm run build` — typecheck (`tsc`) + production build to `dist/`
 - `npm run build:portable` — single-file build to `dist-portable/index.html` (USB/file:// use; no service worker — `virtual:pwa-register` is aliased to `src/pwa-stub.ts`)
 - `npm run preview` — serve the production build (needed to test the PWA/offline behavior; the service worker is not active in `npm run dev`)
+- `npm test` — vitest; Dexie runs against fake-indexeddb in Node (see `src/backup.test.ts` for the pattern: `import 'fake-indexeddb/auto'` before anything that touches `db`)
 
 ## Architecture
 
@@ -35,6 +36,7 @@ locally in IndexedDB (Dexie). There is intentionally **no backend server** yet.
 - `src/components/PhaseChecklist.tsx` — shared checklist; passing `ftoId` enables sign-off, omitting it is the trainee read-only view.
 - `src/components/TraineeSummary.tsx` — hours (vs. required-hours setting), days passed/observed, tasks, phases.
 - DORs carry `hoursCredited` (accumulates toward required hours) and `dailyResult` (`pass` | `needs_improvement`).
+- `src/backup.ts` — whole-database JSON export/import (replace-all, id-preserving); UI in the admin "Backup & transfer" tab. New tables must be added to `BackupFile`, `exportData`, `validateBackup`, `importData`, and the round-trip test.
 
 ## Rules for this codebase
 
