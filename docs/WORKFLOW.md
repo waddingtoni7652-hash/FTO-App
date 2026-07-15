@@ -65,6 +65,29 @@ A dual-access FTO/Trainee portal for corrections field training:
 - [ ] TDCJ standards module
 - [ ] Per-agency task customization (add/hide tasks without code changes)
 
+### Phase P — Productization (selling to other counties)
+
+Cross-cutting track; items become mandatory before any paid/external deployment.
+
+- [ ] **Code-signing certificate** (~$100–400/yr) and sign the exe/installer in the
+  build — removes the SmartScreen "Windows protected your PC" prompt. Biggest
+  single professionalism win; config change, not a rewrite.
+- [ ] **Branding:** custom app icon (`.ico` ≥256px wired into electron-builder
+  `win.icon`), product name, about screen. Replaces the default Electron icon.
+- [ ] **Traditional installer target** alongside the portable exe (electron-builder
+  NSIS target from the same codebase) for counties that prefer "install on the
+  training office PC"; add auto-update once there's a distribution channel.
+- [ ] **Per-agency customization** (Phase C) is a sales prerequisite — no two FTO
+  programs are identical.
+- [ ] **Phase D (sync + real auth) is a sales prerequisite** — plaintext PIN storage
+  and no real authentication cannot ship to paying customers.
+- [ ] **CJIS awareness:** officer training records are a lighter lift, but if any
+  agency puts inmate-related data in the app, CJIS Security Policy compliance
+  (encryption at rest, auditing, access control) becomes a hard requirement.
+  Decide and document the data-scope boundary before selling.
+- [ ] Licensing/support story (versioning, release notes, how agencies get updates
+  on air-gapped machines).
+
 ### Phase D — Sync & real auth (when a server is allowed)
 - [ ] Backend with real authentication (replaces PIN-as-security)
 - [ ] Sync engine: offline devices reconcile when connectivity is available (export/import from Phase B is the stepping stone)
