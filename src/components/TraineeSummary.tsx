@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, DEFAULT_REQUIRED_HOURS, SETTING_REQUIRED_HOURS } from '../db'
-import { PHASES, ALL_TASKS } from '../data/standards'
+import { useCurriculum } from '../curriculum'
 
 /** Hours, milestones, and daily-result rollup for one trainee. */
 export default function TraineeSummary({ traineeId }: { traineeId: number }) {
@@ -15,8 +15,9 @@ export default function TraineeSummary({ traineeId }: { traineeId: number }) {
     [traineeId]
   )
   const reqSetting = useLiveQuery(() => db.settings.get(SETTING_REQUIRED_HOURS), [])
+  const cur = useCurriculum()
 
-  if (!dors || !signed) return null
+  if (!dors || !signed || !cur) return null
 
   const requiredHours = (() => {
     const n = Number(reqSetting?.value)
@@ -25,7 +26,11 @@ export default function TraineeSummary({ traineeId }: { traineeId: number }) {
   const hours = dors.reduce((sum, d) => sum + (d.hoursCredited ?? 0), 0)
   const passed = dors.filter((d) => d.dailyResult === 'pass').length
   const signedIds = new Set(signed.map((c) => c.taskId))
-  const phasesDone = PHASES.filter((p) => p.tasks.every((t) => signedIds.has(t.id))).length
+  // Count only tasks in the effective curriculum (hidden tasks don't count).
+  const signedVisible = cur.allTasks.filter((t) => signedIds.has(t.id)).length
+  const phasesDone = cur.phases.filter(
+    (p) => p.tasks.length > 0 && p.tasks.every((t) => signedIds.has(t.id))
+  ).length
 
   return (
     <div className="stats">
@@ -43,13 +48,13 @@ export default function TraineeSummary({ traineeId }: { traineeId: number }) {
       </div>
       <div className="stat">
         <div className="stat-num">
-          {signedIds.size}<span className="stat-sub">/{ALL_TASKS.length}</span>
+          {signedVisible}<span className="stat-sub">/{cur.allTasks.length}</span>
         </div>
         <div className="stat-label">Tasks signed off</div>
       </div>
       <div className="stat">
         <div className="stat-num">
-          {phasesDone}<span className="stat-sub">/{PHASES.length}</span>
+          {phasesDone}<span className="stat-sub">/{cur.phases.length}</span>
         </div>
         <div className="stat-label">Phases complete</div>
       </div>

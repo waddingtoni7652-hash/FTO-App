@@ -322,6 +322,20 @@ button.link {
   padding-left: 0;
 }
 
+.curriculum-hidden > .task-title,
+.curriculum-hidden > .muted,
+.curriculum-hidden > .ref {
+  opacity: 0.5;
+}
+
+.task-edit-form {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.6rem 0.9rem;
+  margin-top: 0.4rem;
+  max-width: 34rem;
+}
+
 .task.done .task-title {
   color: var(--green);
 }

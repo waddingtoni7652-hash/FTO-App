@@ -79,6 +79,37 @@ export interface Evaluation {
   createdAt: string
 }
 
+/**
+ * Per-agency change to a BUILT-IN task (from src/data/standards.ts), stored as
+ * a delta so the baseline curriculum can still be updated in code releases.
+ * Absent fields mean "use the baseline value".
+ */
+export interface TaskOverride {
+  /** Built-in task id (e.g. 'p1-facility-tour'). Primary key. */
+  taskId: string
+  /** Hidden tasks don't appear in checklists or count toward progress/certificates. */
+  hidden?: boolean
+  title?: string
+  description?: string
+  reference?: string
+}
+
+/** Agency-added task. Appears in its phase after the built-in tasks. */
+export interface CustomTask {
+  id?: number
+  phaseId: string
+  title: string
+  description: string
+  reference: string
+  hidden?: boolean
+  createdAt: string
+}
+
+/** TaskCompletion.taskId used for a custom task. */
+export function customTaskId(id: number): string {
+  return `custom-${id}`
+}
+
 export interface Setting {
   key: string
   value: string
@@ -89,6 +120,8 @@ class FtoDb extends Dexie {
   taskCompletions!: Table<TaskCompletion, number>
   dors!: Table<Dor, number>
   evaluations!: Table<Evaluation, number>
+  taskOverrides!: Table<TaskOverride, string>
+  customTasks!: Table<CustomTask, number>
   settings!: Table<Setting, string>
 
   constructor() {
@@ -113,6 +146,11 @@ class FtoDb extends Dexie {
     // v3: weekly / end-of-phase evaluations.
     this.version(3).stores({
       evaluations: '++id, traineeId, ftoId, date'
+    })
+    // v4: per-agency curriculum customization (hide/edit built-in tasks, add custom ones).
+    this.version(4).stores({
+      taskOverrides: 'taskId',
+      customTasks: '++id, phaseId'
     })
   }
 }

@@ -70,7 +70,11 @@ A dual-access FTO/Trainee portal for corrections field training:
 ### Phase C — Multi-track curriculum
 - [ ] `track` concept in data model (TCOLE Jail vs TDCJ)
 - [ ] TDCJ standards module
-- [ ] Per-agency task customization (add/hide tasks without code changes)
+- [x] Per-agency task customization (2026-07-15) — admin "Curriculum" tab: hide/edit
+  built-in tasks (stored as deltas in `taskOverrides`, Dexie v4), add/edit/delete
+  agency tasks (`customTasks`, ids `custom-<n>` in completions). Effective curriculum
+  merged by `src/curriculum.ts` (`useCurriculum()`); all progress/certificate math uses
+  it. Backup format v3 (v1/v2 still import). Still open: custom phases, task reordering.
 
 ### Phase P — Productization / go-to-market (selling to other counties)
 
@@ -88,8 +92,8 @@ Cross-cutting track; items become mandatory before any paid/external deployment.
   needed). Installed copies store data in `%APPDATA%\fto-portal` (per-machine),
   NOT next to the exe — only the portable/USB exe uses `FTO-Portal-Data/`
   (2026-07-14). Still open: auto-update once there's a distribution channel.
-- [ ] **Per-agency customization** (Phase C) is a sales prerequisite — no two FTO
-  programs are identical.
+- [x] **Per-agency customization** (Phase C) — shipped 2026-07-15 (task-level; custom
+  phases/reordering still open).
 - [ ] **Phase D (sync + real auth) is a sales prerequisite** — plaintext PIN storage
   and no real authentication cannot ship to paying customers.
 - [ ] **CJIS awareness:** officer training records are a lighter lift, but if any
@@ -188,3 +192,22 @@ Cross-cutting track; items become mandatory before any paid/external deployment.
 - **Next up:** user is sourcing real agency TCOLE FTO documents/DOR forms — when they arrive,
   reshape the printable DOR to match and run the SME curriculum review. Remaining Phase B/P:
   per-agency task customization (Phase C), code signing, product name decision.
+
+### 2026-07-15 — Session 2 continued (daytime)
+- **App version display:** package.json version baked in via Vite `define` (both configs),
+  shown as a fixed corner tag on every screen incl. setup/login; hidden when printing.
+  Ships with the next release (v0.2.0 exes in the wild predate it).
+- **Per-agency curriculum customization (Phase C item, sales prerequisite):** admin
+  "Curriculum" tab — hide/show/edit built-in tasks, reset-to-baseline, add/edit/hide/delete
+  custom agency tasks (delete warns about and removes that task's sign-off records).
+  Built-in edits stored as deltas (`taskOverrides`), custom tasks in `customTasks`
+  (Dexie v4); `src/curriculum.ts#useCurriculum()` merges baseline + deltas and every
+  consumer (checklists, summaries, roster progress, certificates) uses the effective
+  curriculum, so hidden tasks stop counting everywhere and hidden-task sign-offs survive
+  a hide/show round trip. Backup format v3 adds both tables (v1/v2 files still import).
+  Tests: `curriculum.test.ts` (merge logic) + extended backup suite — 7 total.
+  Verified via CDP in the real Electron app on a v3→v4-migrated database: hide → 30/31
+  and program-complete revoked; custom task signed → 31/31 restored; trainee sees the
+  customized checklist read-only with no Curriculum tab; delete-with-sign-offs warns.
+- v0.2.0 remains the released build (user is field-testing it on a USB stick at work);
+  these features await the next release cut.

@@ -68,13 +68,24 @@ describe('backup export/import round trip', () => {
       createdAt: '2026-07-14T19:00:00.000Z'
     })
     await db.settings.put({ key: 'requiredHours', value: '200' })
+    await db.taskOverrides.put({ taskId: 'p1-prea', hidden: true })
+    await db.taskOverrides.put({ taskId: 'p1-chain-of-command', reference: 'Agency policy 1.04' })
+    const customId = await db.customTasks.add({
+      phaseId: 'phase-2',
+      title: 'Agency booking software login',
+      description: 'Log into the booking system and complete a test entry.',
+      reference: 'Agency policy',
+      createdAt: '2026-07-15T00:00:00.000Z'
+    })
 
     const backup = await exportData()
-    expect(backup.formatVersion).toBe(2)
+    expect(backup.formatVersion).toBe(3)
     expect(backup.users).toHaveLength(3)
     expect(backup.taskCompletions).toHaveLength(1)
     expect(backup.dors).toHaveLength(1)
     expect(backup.evaluations).toHaveLength(1)
+    expect(backup.taskOverrides).toHaveLength(2)
+    expect(backup.customTasks).toHaveLength(1)
     expect(backup.settings).toHaveLength(1)
 
     // Simulate a different device with unrelated data that must be replaced.
@@ -82,6 +93,8 @@ describe('backup export/import round trip', () => {
     await db.taskCompletions.clear()
     await db.dors.clear()
     await db.evaluations.clear()
+    await db.taskOverrides.clear()
+    await db.customTasks.clear()
     await db.settings.clear()
     await db.users.add({
       name: 'Other Device User',
@@ -126,6 +139,12 @@ describe('backup export/import round trip', () => {
 
     const setting = await db.settings.get('requiredHours')
     expect(setting?.value).toBe('200')
+
+    expect((await db.taskOverrides.get('p1-prea'))?.hidden).toBe(true)
+    expect((await db.taskOverrides.get('p1-chain-of-command'))?.reference).toBe('Agency policy 1.04')
+    const customBack = await db.customTasks.get(customId)
+    expect(customBack?.title).toBe('Agency booking software login')
+    expect(customBack?.phaseId).toBe('phase-2')
   })
 
   it('accepts format-version-1 backups (no evaluations table)', async () => {
@@ -140,8 +159,12 @@ describe('backup export/import round trip', () => {
     }
     const parsed = validateBackup(JSON.parse(JSON.stringify(v1)))
     expect(parsed.evaluations).toEqual([])
+    expect(parsed.taskOverrides).toEqual([])
+    expect(parsed.customTasks).toEqual([])
     await importData(parsed)
     expect(await db.evaluations.count()).toBe(0)
+    expect(await db.taskOverrides.count()).toBe(0)
+    expect(await db.customTasks.count()).toBe(0)
     expect((await db.settings.get('requiredHours'))?.value).toBe('120')
   })
 
@@ -164,5 +187,29 @@ describe('backup export/import round trip', () => {
         settings: []
       })
     ).toThrow('missing the "evaluations" table')
+    // v2 files legitimately lack the v3 curriculum tables — they default to empty.
+    const v2ok = validateBackup({
+      app: 'fto-portal',
+      formatVersion: 2,
+      users: [],
+      taskCompletions: [],
+      dors: [],
+      evaluations: [],
+      settings: []
+    })
+    expect(v2ok.taskOverrides).toEqual([])
+    expect(v2ok.customTasks).toEqual([])
+    expect(() =>
+      validateBackup({
+        app: 'fto-portal',
+        formatVersion: 3,
+        users: [],
+        taskCompletions: [],
+        dors: [],
+        evaluations: [],
+        taskOverrides: [],
+        settings: []
+      })
+    ).toThrow('missing the "customTasks" table')
   })
 })

@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type User } from '../db'
-import { ALL_TASKS } from '../data/standards'
+import { useCurriculum } from '../curriculum'
 import ProgressBar from './ProgressBar'
 import PhaseChecklist from './PhaseChecklist'
 import DorList from './DorList'
@@ -11,22 +11,28 @@ import EvalForm from './EvalForm'
 import TraineeSummary from './TraineeSummary'
 
 function TraineeRow({ trainee, onOpen }: { trainee: User; onOpen: () => void }) {
+  const cur = useCurriculum()
   const signed = useLiveQuery(
     () =>
       db.taskCompletions
         .where('traineeId')
         .equals(trainee.id!)
         .filter((c) => c.status === 'signed_off')
-        .count(),
+        .toArray(),
     [trainee.id]
   )
+  // Count only sign-offs for tasks in the effective curriculum.
+  const signedVisible =
+    cur && signed
+      ? cur.allTasks.filter((t) => signed.some((c) => c.taskId === t.id)).length
+      : 0
   return (
     <button className="user-btn" onClick={onOpen}>
       <div className="trainee-row">
         <span>
           {trainee.name} <span className="muted">#{trainee.badgeNo}</span>
         </span>
-        <ProgressBar done={signed ?? 0} total={ALL_TASKS.length} />
+        <ProgressBar done={signedVisible} total={cur?.allTasks.length ?? 0} />
       </div>
     </button>
   )

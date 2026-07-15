@@ -12,6 +12,7 @@ import {
 import { exportData, importData, validateBackup } from '../backup'
 import { useAuth } from '../auth'
 import TraineeBrowser from '../components/TraineeBrowser'
+import CurriculumEditor from '../components/CurriculumEditor'
 
 function CreateUserForm({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState('')
@@ -289,7 +290,7 @@ function BackupPanel() {
 export default function AdminDashboard() {
   const { user } = useAuth()
   const users = useLiveQuery(() => db.users.toArray(), [])
-  const [tab, setTab] = useState<'users' | 'trainees' | 'settings' | 'data'>('users')
+  const [tab, setTab] = useState<'users' | 'trainees' | 'curriculum' | 'settings' | 'data'>('users')
   const [creating, setCreating] = useState(false)
 
   if (!users || !user) return <p className="muted">Loading…</p>
@@ -305,6 +306,9 @@ export default function AdminDashboard() {
         </button>
         <button className={tab === 'trainees' ? 'tab active' : 'tab'} onClick={() => setTab('trainees')}>
           Trainees
+        </button>
+        <button className={tab === 'curriculum' ? 'tab active' : 'tab'} onClick={() => setTab('curriculum')}>
+          Curriculum
         </button>
         <button className={tab === 'settings' ? 'tab active' : 'tab'} onClick={() => setTab('settings')}>
           Program settings
@@ -358,6 +362,8 @@ export default function AdminDashboard() {
           emptyMessage="No trainee accounts yet. Create one under Users & assignments."
         />
       )}
+
+      {tab === 'curriculum' && <CurriculumEditor />}
 
       {tab === 'settings' && <ProgramSettings />}
 

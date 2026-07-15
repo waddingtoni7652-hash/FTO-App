@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type TaskCompletion } from '../db'
-import { PHASES, ALL_TASKS, type TrainingTask } from '../data/standards'
+import { type TrainingTask } from '../data/standards'
+import { useCurriculum } from '../curriculum'
 import CertificatePrint from './CertificatePrint'
 
 interface Props {
@@ -21,8 +22,9 @@ export default function PhaseChecklist({ traineeId, ftoId }: Props) {
     [traineeId]
   )
   const users = useLiveQuery(() => db.users.toArray(), [])
+  const cur = useCurriculum()
 
-  if (!completions || !users) return <p className="muted">Loading…</p>
+  if (!completions || !users || !cur) return <p className="muted">Loading…</p>
 
   const byTask = new Map<string, TaskCompletion>(completions.map((c) => [c.taskId, c]))
   const userName = (id?: number) => users.find((u) => u.id === id)?.name ?? 'Unknown'
@@ -98,9 +100,9 @@ export default function PhaseChecklist({ traineeId, ftoId }: Props) {
     }
   }
 
-  const programDone = ALL_TASKS.every(isSigned)
-  const certPhase = certScope === null ? null : PHASES.find((p) => p.id === certScope) ?? null
-  const certTasks = certScope === 'program' ? ALL_TASKS : certPhase?.tasks ?? null
+  const programDone = cur.allTasks.length > 0 && cur.allTasks.every(isSigned)
+  const certPhase = certScope === null ? null : cur.phases.find((p) => p.id === certScope) ?? null
+  const certTasks = certScope === 'program' ? cur.allTasks : certPhase?.tasks ?? null
 
   return (
     <div className="checklist">
@@ -112,9 +114,9 @@ export default function PhaseChecklist({ traineeId, ftoId }: Props) {
           </button>
         </p>
       )}
-      {PHASES.map((phase) => {
+      {cur.phases.map((phase) => {
         const done = phase.tasks.filter(isSigned).length
-        const phaseDone = done === phase.tasks.length
+        const phaseDone = phase.tasks.length > 0 && done === phase.tasks.length
         return (
           <section key={phase.id} className="card">
             <h3>
