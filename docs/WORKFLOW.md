@@ -141,3 +141,9 @@ Cross-cutting track; items become mandatory before any paid/external deployment.
   default `%APPDATA%\fto-portal`. Verified: portable exe still creates `FTO-Portal-Data`
   next to itself; installer silent-installs, stores data in AppData, uninstalls cleanly;
   icon embedded in both artifacts.
+- Published first public release for outside testing: **v0.1.0** on GitHub
+  (installer + portable exe + START HERE.txt) —
+  https://github.com/waddingtoni7652-hash/FTO-App/releases/tag/v0.1.0. Future test builds:
+  bump version in package.json, rebuild both targets, `gh release create v0.x.0 ...`.
+  User feedback pending (a friend is evaluating from a fresh-user POV); user plans small
+  design changes next session.
