@@ -53,10 +53,17 @@ A dual-access FTO/Trainee portal for corrections field training:
 - [x] Portable single-file build (`npm run build:portable` → `dist-portable/index.html`) for USB/file:// use; PIN hashing switched to pure-JS SHA-256 (same output) so it works in non-secure contexts
 
 ### Phase B — Program management
-- [ ] Curriculum verification pass against official TCOLE BCCC course and TCJS rules (agency SME review)
-- [ ] Trainee detail: notes per task, remedial/re-training flags
-- [ ] Weekly/end-of-phase evaluations in addition to DORs
-- [ ] Printable/exportable reports (DOR PDF, phase completion certificate)
+- [~] Curriculum verification pass — TCJS citations verified/corrected against the 37 TAC
+  Part 9 chapter & section structure (2026-07-15); TCOLE course numbers dropped (renumbered
+  by TCOLE, new curriculum 4/2026). **Still open: agency SME review** of task content and
+  real agency forms/task lists to replace the baseline.
+- [x] Trainee detail: notes per task, remedial/re-training flags (2026-07-15)
+- [x] Weekly/end-of-phase evaluations in addition to DORs — `evaluations` table (Dexie v3),
+  FTO-authored, trainee-acknowledged, printable; backup format v2 (v1 files still import)
+  (2026-07-15)
+- [x] Printable/exportable reports — DOR print/PDF, evaluation print/PDF, phase & program
+  completion certificates via browser print dialog (works in all three builds, no
+  libraries/network); agency name program setting feeds report headers (2026-07-15)
 - [x] Data export/import (JSON file) — admin "Backup & transfer" tab; replace-all import with confirmation; round-trip covered by `src/backup.test.ts` (2026-07-14)
 - [x] USB desktop app (`npm run build:usb`) — portable Electron exe; database stored in `FTO-Portal-Data/` next to the exe so records travel on the stick; `START HERE.txt` end-user instructions shipped alongside (2026-07-14)
 
@@ -105,7 +112,9 @@ Cross-cutting track; items become mandatory before any paid/external deployment.
   Device access = data access, including all PINs. Must be removed in Phase D (real auth).
 - Data lives on one device only; clearing browser storage erases records (export/backup is Phase B).
 - Sign-offs can be un-checked by any FTO (no immutable audit trail yet).
-- Curriculum references are unverified against current official publications.
+- Curriculum citations were checked against the 37 TAC Part 9 structure (2026-07-15), but
+  task content itself is still baseline material — agency SME review required before
+  operational use.
 - Portable (USB) **HTML** build: data lives in the browser of the computer that opened it, not on the USB stick. Use Backup & transfer (admin tab) to carry a JSON export on the stick between machines. **Solved for Windows by the USB desktop app** (`npm run build:usb`), which stores the database on the stick itself. Import is still replace-all, not merge — two devices/sticks editing in parallel cannot be reconciled yet (that's Phase D sync).
 - USB desktop app: Windows-only, exe is unsigned (SmartScreen "Run anyway" prompt), and pulling the stick while the app is open can lose recent writes. Whole-drive copy = full backup.
 - Backup files contain everything, including plaintext PINs — treat as sensitive.
@@ -147,3 +156,32 @@ Cross-cutting track; items become mandatory before any paid/external deployment.
   bump version in package.json, rebuild both targets, `gh release create v0.x.0 ...`.
   User feedback pending (a friend is evaluating from a fresh-user POV); user plans small
   design changes next session.
+
+### 2026-07-15 — Session 2 (autonomous overnight run, user-authorized pushes)
+- **Printable reports shipped:** DOR print/PDF (paper-form layout with ratings matrix and
+  signature lines), phase + program completion certificates, evaluation reports. All use a
+  shared `PrintView` overlay + the browser's print dialog ("Microsoft Print to PDF"), so PDF
+  output needs no libraries or network and works in all three builds. New **agency/facility
+  name** program setting feeds the top bar and report headers.
+- **Curriculum citation pass:** every TCJS reference checked against the real 37 TAC Part 9
+  chapter/section structure; nonexistent Ch. 351 cites replaced (emergency plans are
+  §263.40, which covers riots/escapes/fires); chapter titles corrected (283 Discipline and
+  Grievances, 291 Services and Activities, 271 Classification and Separation); §275.1
+  60/30-minute observation intervals confirmed; section-level cites added (275.5, 275.6,
+  275.7, 273.6, 263.41, Ch. 269, Ch. 281). TCOLE course numbers deliberately dropped
+  (renumbering: #1120/#1121 → #1196/#1197, new curriculum April 2026). SME review still open.
+- **Task notes + re-training flags:** FTOs add/edit a note and toggle a "Re-training" flag
+  per task; trainees see both read-only. Unchecking a sign-off now preserves records that
+  carry a note/flag (previously the record was deleted).
+- **Weekly/end-of-phase evaluations:** new `evaluations` table (Dexie v3), eval form
+  (overall 1–5 rating, strengths, improvement areas, development plan, advance/remediate
+  recommendation), trainee acknowledgment with pending-notice, printable like DORs. Backup
+  format bumped to v2 (adds evaluations; v1 files still import — tested).
+- **Verification:** new project skill `.claude/skills/verify/SKILL.md` documents the
+  Electron+CDP drive recipe (no Playwright needed — Node's built-in WebSocket). Both features
+  were driven end-to-end in the real Electron app, including a v2→v3 migration check on a
+  database from the previous run and role-separation probes. `npm run build`,
+  `build:portable`, `build:usb`, and `npm test` (3 tests) all pass.
+- **Next up:** user is sourcing real agency TCOLE FTO documents/DOR forms — when they arrive,
+  reshape the printable DOR to match and run the SME curriculum review. Remaining Phase B/P:
+  per-agency task customization (Phase C), code signing, product name decision.
