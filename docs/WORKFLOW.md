@@ -213,3 +213,6 @@ Cross-cutting track; items become mandatory before any paid/external deployment.
   these features await the next release cut.
 - **Field test result:** user ran v0.2.0 from a USB stick on a work machine — went well
   (no blockers reported). First successful real-facility run.
+- Published **v0.3.0** on GitHub (portable exe + installer + START HERE.txt) —
+  https://github.com/waddingtoni7652-hash/FTO-App/releases/tag/v0.3.0. Adds the
+  Curriculum tab and on-screen version display.
